@@ -35,7 +35,7 @@ class Student:
 	def load_all(self):
 		with pg.connect(user='postgres', password='123', database='postgres',host='localhost') as connection:
 			with connection.cursor() as cursor:
-				cursor.execute('SELECT sid,sname,room,ph,days,fee from student')
+				cursor.execute('SELECT sid,sname,room,ph,days,fee from student order by sid')
 				info=cursor.fetchall()
 				return info
 
@@ -110,7 +110,7 @@ class Food:
 			with connection.cursor() as cursor:
 				try:
 					cursor.execute('SELECT count(*) from poll where sid=%s',(uid))
-					return cursor.fetchone()
+					return cursor.fetchall()
 				except:
 					return 0
 	def result():
@@ -123,7 +123,7 @@ class Food:
 	def delete():
 		with pg.connect(user='postgres', password='123', database='postgres',host='localhost') as connection:
 			with connection.cursor() as cursor:
-				cursor.execute("SELECT * from poll")
+				cursor.execute("DELETE from poll")
 					
 	
 	@classmethod			
@@ -200,7 +200,7 @@ class Room:
 	def load_all(self):
 		with pg.connect(user='postgres', password='123', database='postgres',host='localhost') as connection:
 			with connection.cursor() as cursor:
-					cursor.execute('SELECT * from room')
+					cursor.execute('SELECT * from room order by roomid')
 					info=cursor.fetchall()
 					return info
 		
@@ -243,7 +243,7 @@ class Employee:
 	def load_all(self):
 		with pg.connect(user='postgres', password='123', database='postgres',host='localhost') as connection:
 			with connection.cursor() as cursor:
-				cursor.execute('SELECT eid,ename,ph,days,salary from employee')
+				cursor.execute('SELECT eid,ename,ph,days,salary from employee order by eid')
 				info=cursor.fetchall()
 				print(info)
 				return info
