@@ -41,15 +41,12 @@ def sattendance():
 	if c==0:
 		info=db.Student.load_all()
 		c=1
-	"""info1=db.Student.load_all()
+	info1=db.Student.load_all()
 	for i in info:
-		try:
-			k=info1.index(i)
-			info[j]=info1[k]
-			print(k)
-			j=j+1
-		except:
-			continue"""
+			k=info.index(i)
+			if i in info1:
+				j=info1.index(i)
+				info[k]=info1[j]
 	return render_template('sattendance.html',info=info)
 
 @app.route('/satt',methods=['POST','GET'])
@@ -135,7 +132,7 @@ def codes(uid):
 				c=1
 	print('l=',l)
 	if len(l)!=0:
-		return render_template('request.html',l=l)
+		return render_template('request.html',l=l,uid=uid)
 	return redirect('/backs/'+uid)
 @app.route('/rooms/<uid>',methods=['POST','GET'])
 def rooms(uid):
@@ -180,32 +177,35 @@ def rrequest(uid):
 	return redirect('/backs/'+uid)
 @app.route('/scheme/<uid>',methods=['POST','GET'])
 def scheme(uid):
-	global d
 	global day
-	global cnt
+	cnt=0
 	today=date.today()
 	print(today.day)
 	c=0
-	if d==0 and today.day==1:
-		info=db.Food.delete()
-		d=1
-	if today.day==1:
+	if today.day==2:
 		info=db.Food.result()
 		for i in info:
-			c=0
-			for j in range(0,7):
-				if i[0] in day[j]:
-					c=1
-			if c==0:
-				day[cnt]=i[0]
-				cnt=cnt-1
+			day[cnt]=i[0]
+			cnt=cnt+1
+		if cnt!=7:
+			while cnt<7:
+				info1=db.Food.load_all()
+				for i in info1:
+					k=0
+					if i[1]=='Breakfast':
+						for j in info:
+							if i[0]==j[0]:
+								k=1
+						if k==0:
+							day[cnt]=i[0]
+							cnt=cnt+1
 			
 	return render_template('schedule.html',uid=uid,info=day)
 @app.route('/poll/<uid>')
 def poll(uid):	
 	global cnt
 	today=date.today()
-	if today.day==1:
+	if today.day==2:
 		cnt=6
 		info=db.Food.load_from_db()
 		return render_template('poll.html',uid=uid,info=info)
@@ -214,12 +214,18 @@ def poll(uid):
 
 @app.route('/pollc/<uid>', methods=['POST','GET'])
 def pollc(uid):
+	global d
 	if request.method == 'POST':
 		name=request.form.keys()
+		today=date.today()
+		print('d',d)
+		if d==0 and today.day==2:
+			db.Food.delete()
+			d=1
 		print(name)
 		count=db.Food.count(uid)
 		print('count:',count[0])
-		if count[0]<7:
+		if count[0][0]<7:
 			db.Food.poll(name,uid)
 		url='/backs/'+uid
 	return redirect(url)
